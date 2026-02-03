@@ -1,12 +1,22 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Heart, Plane, Car, Star, Sparkles, Crown } from 'lucide-react';
+import { Heart, Plane, Car, Star, Sparkles, Crown, ArrowRight } from 'lucide-react';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 
-const FinalScreen = () => {
+interface FinalScreenProps {
+  onContinue?: () => void;
+}
+
+const FinalScreen = ({ onContinue }: FinalScreenProps) => {
   const [showTicket, setShowTicket] = useState(false);
+  const [showContinue, setShowContinue] = useState(false);
+  const { play } = useSoundEffects();
 
   useEffect(() => {
+    // Play success sound
+    play('success');
+    
     // Epic confetti celebration
     const duration = 5000;
     const animationEnd = Date.now() + duration;
@@ -31,12 +41,20 @@ const FinalScreen = () => {
 
     // Show ticket after delay
     setTimeout(() => setShowTicket(true), 2000);
-  }, []);
+    // Show continue button after ticket
+    setTimeout(() => setShowContinue(true), 4000);
+  }, [play]);
+
+  const handleContinue = () => {
+    play('click');
+    onContinue?.();
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden"
     >
       {/* Background Effects */}
@@ -187,6 +205,22 @@ const FinalScreen = () => {
               </div>
             </div>
           </motion.div>
+        )}
+
+        {/* Continue to Dashboard Button */}
+        {showContinue && onContinue && (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleContinue}
+            className="mt-8 w-full py-4 rounded-2xl bg-gradient-neon text-white font-semibold 
+              flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300"
+          >
+            <span>Acessar seu Painel VIP</span>
+            <ArrowRight className="w-5 h-5" />
+          </motion.button>
         )}
 
         {/* Love Message */}
